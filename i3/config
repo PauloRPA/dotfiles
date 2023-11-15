@@ -1,0 +1,227 @@
+# ==================== Colors ====================
+
+set $black #000000
+set $white #ffffff
+
+set $fg-color #333333
+set $bg-color #111111
+
+set $in-color #4a4e69
+set $ur-color #11112a
+
+# class                   border   background   text     indicator   child_border
+client.focused            $black   $fg-color    $white   $white      $black 
+client.unfocused          $black   $bg-color    $white   $white      $black 
+client.focused_inactive   $black   $in-color    $white   $white      $black 
+client.urgent             $black   $ur-color    $white   $white      $black 
+client.placeholder        $black   $black       $white   $white      $black
+
+# ==================== Appearence ====================
+
+font pango:Noto Sans Mono 9
+font pango:'SauceCodePro NF' 9
+
+# ==================== Basic keybinds ====================
+# Super: Mod4     Alt: Mod1
+
+set $mod Mod4
+set $alt Mod1
+
+# Start a terminal
+bindsym $mod+Return exec kitty --session tmux-session.conf
+
+# Kill focused window
+bindsym $alt+Shift+q kill
+
+# Navigation
+set $left j
+set $right k
+set $up h
+set $down l
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+
+
+# ==================== Keybinds ====================
+
+# ---------- Special keys -----------
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && exec pkill -SIGRTMIN+12 i3blocks
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && exec pkill -SIGRTMIN+12 i3blocks
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && exec pkill -SIGRTMIN+12 i3blocks
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +50 && exec pkill -SIGRTMIN+11 i3blocks 
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 50- && exec pkill -SIGRTMIN+11 i3blocks
+
+bindsym XF86AudioNext exec --no-startup-id playerctl next
+bindsym XF86AudioPrev exec --no-startup-id playerctl previous
+
+bindsym XF86AudioPause exec --no-startup-id playerctl play-pause
+bindsym XF86AudioPlay exec --no-startup-id playerctl play-pause
+
+bindsym XF86AudioStop  exec --no-startup-id playerctl stop
+
+# ---------- System keybindings ----------
+# Launchers shortcuts
+bindsym $mod+m exec /home/prpa/.config/rofi/applets/bin/screenshot.sh
+bindsym $mod+a exec /home/prpa/.config/rofi/applets/bin/quicklinks.sh
+bindsym $mod+d exec /home/prpa/.config/rofi/launchers/type-1/launcher.sh
+bindsym $mod+p exec /home/prpa/.config/rofi/launchers/type-1/launcher.sh
+bindsym $mod+t exec /home/prpa/.config/rofi/powermenu/type-2/powermenu.sh
+
+# Software shortcuts
+bindsym $mod+b exec flatpak run io.gitlab.librewolf-community
+bindsym $mod+n exec blueman-manager
+bindsym $mod+g exec pavucontrol
+bindsym $mod+e exec dolphin
+bindsym $mod+KP_Divide exec kitty nvim /mnt/extended/resources/documentos/notas/Memo.md
+bindsym Ctrl+$mod+space exec $HOME/.config/scripts/xkeyboard.sh
+
+
+# ========== Window manager ==========
+
+# Exit i3 and terminate X11 session
+bindsym $mod+Shift+BackSpace exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+
+# Reload the configuration file
+bindsym $mod+Shift+c reload
+
+# Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# Enter resize mode
+bindsym $mod+r mode "resize"
+
+# ---------- Change focus ----------
+# Navigation keys
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+
+# Common keys
+bindsym $alt+Tab focus right
+bindsym $alt+Shift+Tab focus left
+
+# Arrow keys
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+
+# ---------- Move focused window ----------
+# Navigation keys
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+# Arrow keys
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Split in vertical
+bindsym $mod+v split v
+
+# Fullscreen mode 
+bindsym $mod+f fullscreen toggle
+
+# Change container layout (stacked, tabbed, toggle split)
+bindsym $mod+w layout tabbed
+bindsym $mod+q layout toggle split
+
+# Toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# Change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+
+
+# ==================== Startup commands ====================
+
+workspace_layout tabbed
+title_align center
+
+# Start XDG autostart .desktop files using dex. 
+# $XDG_CONFIG_HOME/autostart $XDG_CONFIG_DIRS/autostart
+exec --no-startup-id dex --autostart --environment i3
+
+# nm-applet is a desktop environment-independent system tray GUI.
+exec --no-startup-id nm-applet
+
+# Play startup sound
+exec --no-startup-id mpv --volume=70 --loop-playlist=no --no-video /home/prpa/.config/i3/startup.mp3
+
+# Selects a wallpaper every time i3 is reloaded
+exec_always --no-startup-id feh --bg-scale $(/home/prpa/.config/scripts/setRandomWallpaper.sh /mnt/extended/resources/wallpaper/abstract)
+
+# Launch polybar
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+# ==================== Workspaces ====================
+
+set $ws1 "1: Browser"
+set $ws2 "2: Anotações"
+set $ws3 "3: Documentation"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7: Social"
+set $ws8 "8: Background"
+set $ws9 "9: Geral" 
+set $ws10 "10: Code"
+
+# ---------- Assigns ----------
+assign [class=LibreWolf] $ws1
+assign [class=Brave-browser] $ws1
+
+# ---------- Switch to workspace ----------
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws10
+
+# ---------- Move focused container to workspace ----------
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# ---------- Resize keybindings ----------
+mode "resize" {
+        # Navigation keys
+        bindsym $left resize grow height 10 px or 10 ppt
+        bindsym $right resize shrink height 10 px or 10 ppt
+        bindsym $up resize shrink width 10 px or 10 ppt
+        bindsym $down resize grow width 10 px or 10 ppt
+
+        # Arrow keys
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # Back to normal: Enter or Escape or $mod+r
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+
