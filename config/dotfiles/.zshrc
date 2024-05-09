@@ -252,7 +252,7 @@ function rm_background () {
     do
         case "$option" in
 
-            "Overwrite"
+            "Overwrite")
                 suffix=""
                 break 
                 ;;
