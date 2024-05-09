@@ -13,7 +13,14 @@ HISTFILE=~/.histfile
 HISTSIZE=7000
 SAVEHIST=7000
 
-PS1=$'[%B%F{14}%n%f%b: %B%F{blue}%1~%f%b]%B%F{red}$ %f%b'
+parse_git_branch() {
+        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/\(\*\) \(.*\)/ (\2\1)/'
+}
+
+setopt PROMPT_SUBST
+
+PS1=$'[%B%F{14}%n%f%b: %B%F{blue}%1~%f%b]%B$(parse_git_branch)%F{red}$ %f%b'
+
 
 ######################################
 #             Completion             #
