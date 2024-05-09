@@ -1,12 +1,3 @@
-################################################
-#             Oh my zsh activation             #
-################################################
-
-export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="philips"
-plugins=(git tmux urltools spring httpie asdf gitignore)
-source $ZSH/oh-my-zsh.sh
-
 ###################################
 #             Options             #
 ###################################
@@ -21,6 +12,8 @@ PAGER=less
 HISTFILE=~/.histfile
 HISTSIZE=7000
 SAVEHIST=7000
+
+PS1=$'[%B%F{14}%n%f%b: %B%F{blue}%1~%f%b]%B%F{red}$ %f%b'
 
 ######################################
 #             Completion             #
@@ -86,6 +79,7 @@ fi
 bindkey -s '\e.' 'shrc\n'
 bindkey -s '\eo' 'git log --oneline\n'
 bindkey -s '\es' 'git status\n'
+bindkey -s '\en' 'nvim\n'
 
 #############################################################
 # Variaveis                                                 #
@@ -120,11 +114,22 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share"
 # Software Paths
 #------------------------------------------------------------
 
-export PATH="$PATH:/opt/asdf-vm/bin" # asdf bin
+if [[ -e $(where asdf) ]]; then
+    export PATH="$PATH:/opt/asdf-vm/bin" # asdf bin
+    export JAVA_HOME=$(asdf where java)
+
+    if ! [[ -d "$home/.oh-my-zsh" ]]; then
+        . "$home/.asdf/asdf.sh"
+        # append completions to fpath
+        fpath=(${ASDF_DIR}/completions $fpath)
+        # initialise completions with ZSH's compinit
+        autoload -Uz compinit && compinit
+    fi
+fi
+
 export PATH="$PATH:$con" # Scripts path
 export PATH="$PATH:$home/.local/bin" # Local bin
 
-export JAVA_HOME=$(asdf where java)
 
 #############################################################
 # Alias                                                     #
@@ -141,13 +146,13 @@ alias con="cd $con"
 alias cscp="cd $scp"
 alias scr="cd $scr"
 alias s="cd $scr"
-alias d="cd ~/Desktop/"
+alias d="cd ${home}/Desktop"
 
 # Configuracoes
 #------------------------------------------------------------
 
 alias 3r='nvim ~/.config/i3/config' 
-alias shrc='lvim ~/.zshrc && omz reload' 
+alias shrc='nvim ~/.zshrc && source ~/.zshrc' 
 alias nvrc='nvim ~/.config/nvim/init.lua' 
 alias porc='nvim ~/.config/polybar/config' 
 alias alrc='nvim ~/.config/alacritty/alacritty.yml' 
@@ -155,7 +160,7 @@ alias alrc='nvim ~/.config/alacritty/alacritty.yml'
 # Atalhos
 #------------------------------------------------------------
 
-alias proton="xdg-open https://mail.proton.me/u/0/inbox & disown"
+alias pmail="xdg-open https://mail.proton.me/u/0/inbox & disown"
 alias r='ranger' 
 alias e="files"
 alias code="codium ."
@@ -169,29 +174,7 @@ alias grep='grep -i --colour=auto' # grep colorido e case insensitive
 alias killscr="rm $scr/**" # Delete all screenshots
 
 # Set current dir as a safe.dir
-alias gs="git config --global --add safe.directory $(pwd)"
-
-# Trash-cli dependent
-alias rm="trash"
-
-# Zoxide dependent
-alias cd="z"
-alias c="z -"
-
-# Exa dependent
-alias ls='exa --grid' # exa
-alias ll='exa --long --grid --header --icons -lag' # atalho exa -la
-alias tree='exa --tree ' # atalho mostra uma tree
-alias ltree='exa --tree --level=2' # atalho exa -la
-alias long='exa --tree --long --level=2' # atalho exa -la
-
-# Bat dependent
-alias bat='bat' #Config bat
-
-# Feh dependent
-alias feh="feh -."
-alias fscr="feh $scr/** -F"
-alias fdlp="feh -. -D 2.6 -z -n $dlp/ "
+alias gsd="git config --global --add safe.directory $(pwd)"
 
 #Util
 alias gc='xprop | grep -i wm_class | cut -d\" -f 4' # Busca a classe de uma janela
@@ -218,6 +201,16 @@ alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
 #############################################################
 # Functions                                                 #
 #############################################################
+
+# Install oh my zsh
+function install_ohMyZsh () {
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+}
+
+# Install asdf
+function install_asdf () {
+    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+}
 
 # Find mime type of a file: <file> 
 function get_file_mime_type () {
@@ -259,7 +252,7 @@ function rm_background () {
     do
         case "$option" in
 
-            "Overwrite")
+            "Overwrite"
                 suffix=""
                 break 
                 ;;
@@ -320,32 +313,80 @@ function rm_background () {
 # Automatically initiate ssh-agent and add ID and GitHub keys to it.
 #------------------------------------------------------------
 
-SSH_ENV="$HOME/.ssh/agent-environment"
-
-function start_agent {
-    echo "Initialising new SSH agent..."
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    echo succeeded
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    /usr/bin/ssh-add ~/.ssh/github ~/.ssh/id_ed25519;
-}
-
-# Source SSH settings, if applicable
-
-if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    #ps ${SSH_AGENT_PID} doesn't work under cywgin
-    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-        start_agent;
-    }
-else
-    start_agent;
-fi
-
+#SSH_ENV="$HOME/.ssh/agent-environment"
+#
+#function start_agent {
+#    echo "Initialising new SSH agent..."
+#    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+#    echo succeeded
+#    chmod 600 "${SSH_ENV}"
+#    . "${SSH_ENV}" > /dev/null
+#    /usr/bin/ssh-add ~/.ssh/* 
+#}
+#
+## Source SSH settings, if applicable
+#
+#if [ -f "${SSH_ENV}" ]; then
+#    . "${SSH_ENV}" > /dev/null
+#    #ps ${SSH_AGENT_PID} doesn't work under cywgin
+#    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+#        start_agent;
+#    }
+#else
+#    start_agent;
+#fi
 
 #############################################################
-# Zoxide                                                 #
+# Software dependant config                                 #
+#############################################################
+
+if [[ -e $(where trash) ]]; then
+    # Trash-cli dependent
+    alias rm="trash"
+fi
+
+if [[ -e $(where zoxide) ]]; then
+    # Zoxide dependent
+    alias cd="z"
+    alias c="z -"
+fi
+
+if [[ -e $(where exa) ]]; then
+    # Exa dependent
+    alias ls='exa --grid' # exa
+    alias ll='exa --long --grid --header --icons -lag' # atalho exa -la
+    alias tree='exa --tree ' # atalho mostra uma tree
+    alias ltree='exa --tree --level=2' # atalho exa -la
+    alias long='exa --tree --long --level=2' # atalho exa -la
+fi
+
+if [[ -e $(where bat) ]]; then
+    # Bat dependent
+    alias bat='bat' #Config bat
+fi
+
+if [[ -e $(where feh) ]]; then
+    # Feh dependent
+    alias feh="feh -."
+    alias fscr="feh $scr/** -F"
+    alias fdlp="feh -. -D 2.6 -z -n $dlp/ "
+fi
+
+#############################################################
+# Oh my zsh activation                                      #
+#############################################################
+
+if [[ -d "$home/.oh-my-zsh" ]]; then
+    alias shrc='nvim ~/.zshrc && omz reload' 
+
+    export ZSH="$home/.oh-my-zsh"
+    ZSH_THEME="philips"
+    plugins=(git tmux urltools spring httpie asdf gitignore)
+    source $ZSH/oh-my-zsh.sh
+fi
+
+#############################################################
+# Zoxide                                                    #
 #############################################################
 
 # =============================================================================
@@ -375,10 +416,12 @@ function __zoxide_hook() {
     \command zoxide add -- "$(__zoxide_pwd)"
 }
 
-# Initialize hook.
-# shellcheck disable=SC2154
-if [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]]; then
-    chpwd_functions+=(__zoxide_hook)
+if [[ -e $(where zoxide) ]]; then
+    # Initialize hook.
+    # shellcheck disable=SC2154
+    if [[ ${precmd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]] && [[ ${chpwd_functions[(Ie)__zoxide_hook]:-} -eq 0 ]]; then
+        chpwd_functions+=(__zoxide_hook)
+    fi
 fi
 
 # =============================================================================
@@ -428,32 +471,34 @@ function zi() {
     __zoxide_zi "$@"
 }
 
-if [[ -o zle ]]; then
-    function __zoxide_z_complete() {
-        # Only show completions when the cursor is at the end of the line.
-        # shellcheck disable=SC2154
-        [[ "${#words[@]}" -eq "${CURRENT}" ]] || return 0
+if [[ -e $(where zoxide) ]]; then
+    if [[ -o zle ]]; then
+        function __zoxide_z_complete() {
+            # Only show completions when the cursor is at the end of the line.
+            # shellcheck disable=SC2154
+            [[ "${#words[@]}" -eq "${CURRENT}" ]] || return 0
 
-        if [[ "${#words[@]}" -eq 2 ]]; then
-            _files -/
-        elif [[ "${words[-1]}" == '' ]]; then
-            \builtin local result
-            # shellcheck disable=SC2086,SC2312
-            if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
-                result="${__zoxide_z_prefix}${result}"
-                # shellcheck disable=SC2296
-                compadd -Q "${(q-)result}"
+            if [[ "${#words[@]}" -eq 2 ]]; then
+                _files -/
+            elif [[ "${words[-1]}" == '' ]]; then
+                \builtin local result
+                # shellcheck disable=SC2086,SC2312
+                if result="$(\command zoxide query --exclude "$(__zoxide_pwd)" -i -- ${words[2,-1]})"; then
+                    result="${__zoxide_z_prefix}${result}"
+                    # shellcheck disable=SC2296
+                    compadd -Q "${(q-)result}"
+                fi
+                \builtin printf '\e[5n'
             fi
-            \builtin printf '\e[5n'
-        fi
-        return 0
-    }
+            return 0
+        }
 
-    \builtin bindkey '\e[0n' 'reset-prompt'
-    if [[ "${+functions[compdef]}" -ne 0 ]]; then
-        \compdef -d z
-        \compdef -d zi
-        \compdef __zoxide_z_complete z
+        \builtin bindkey '\e[0n' 'reset-prompt'
+        if [[ "${+functions[compdef]}" -ne 0 ]]; then
+            \compdef -d z
+            \compdef -d zi
+            \compdef __zoxide_z_complete z
+        fi
     fi
 fi
 
