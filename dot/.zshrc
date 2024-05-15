@@ -209,6 +209,10 @@ alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
 # Functions                                                 #
 #############################################################
 
+function fp () {
+    copy_current_path_or_file $@
+}
+
 # Install oh my zsh
 function install_ohMyZsh () {
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
