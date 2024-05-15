@@ -1,0 +1,47 @@
+set clipboard=unnamedplus
+set scrolloff=6
+set hlsearch
+set ignorecase
+set smartcase
+
+"Pane op "Select * pane
+nnoremap <C-l> <C-w>l
+nnoremap <C-h> <C-w>h
+nnoremap <C-k> <C-w>k
+nnoremap <C-j> <C-w>j
+
+"Move half page * and center
+nnoremap <C-d> <C-d>z.
+nnoremap <C-u> <C-u>z.
+
+"Resize *
+nnoremap <C-left> 4<C-w>>
+nnoremap <C-right> 4<C-w><
+nnoremap <C-up> 4<C-w>+
+nnoremap <C-down> 4<C-w>-
+
+"Close current pane
+nnoremap <C-c> <C-w>c
+
+"Buffer op
+nnoremap <Tab> :bn<CR>
+nnoremap <S-Tab> :bp<CR>
+
+"Emacs keybindings for command line mode
+
+"Delete word after
+inoremap <A-d> <C-o>cw
+
+"Move a char *
+inoremap <C-b> <Left>
+inoremap <C-f> <Right>
+
+"Move to *
+inoremap <C-e> <End>
+inoremap <C-a> <Home>
+
+"Delete char
+inoremap <C-d> <Del>
+
+"New line below
+inoremap <C-n> <Esc>o
