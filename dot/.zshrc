@@ -21,7 +21,6 @@ setopt PROMPT_SUBST
 
 PS1=$'[%B%F{14}%n%f%b: %B%F{blue}%1~%f%b]%B$(parse_git_branch)%F{red}$ %f%b'
 
-
 ######################################
 #             Completion             #
 ######################################
@@ -34,6 +33,19 @@ autoload -Uz vcs_info
 precmd() { vcs_info }
 
 zstyle ':vcs_info:git:*' formats '(%b)'
+
+#############################################################
+# Oh my zsh activation                                      #
+#############################################################
+
+if [[ -d "$home/.oh-my-zsh" ]]; then
+    alias shrc='nvim ~/.zshrc && omz reload' 
+
+    export ZSH="$home/.oh-my-zsh"
+    ZSH_THEME="philips"
+    plugins=(git tmux urltools spring httpie asdf gitignore)
+    source $ZSH/oh-my-zsh.sh
+fi
 
 #######################################
 #             Keybindings             #
@@ -49,17 +61,8 @@ bindkey -M menuselect 'l' vi-forward-char
 bindkey -M menuselect ';' undo
 bindkey -M menuselect 'm' accept-and-hold
 
-# Info
-#----------------------------------------------
-
-bindkey -s '\el' 'ls\n'
-bindkey -s '\ew' 'pwd\n'
-
 # Navigation
 #----------------------------------------------
-
-bindkey -s '\e^[' 'PREV=$(pwd); cd ..; echo $PREV\n'
-bindkey -s '\e^]' 'cd $PREV\n'
 
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
@@ -83,9 +86,16 @@ fi
 # Shortcuts
 #----------------------------------------------
 
-bindkey -s '\e.' 'shrc\n'
+bindkey -s '\e[' 'PREV=$(pwd); cd ..; echo $PREV\n'
+bindkey -s '\e^]' 'cd $PREV\n'
+
+bindkey -s '\el' 'ls\n'
+bindkey -s '\ew' 'pwd\n'
+
 bindkey -s '\eo' 'git log --oneline\n'
 bindkey -s '\es' 'git status\n'
+
+bindkey -s '\e.' 'shrc\n'
 bindkey -s '\en' 'nvim\n'
 
 #############################################################
@@ -96,7 +106,13 @@ bindkey -s '\en' 'nvim\n'
 
 # Archive root
 export arq="/mnt/extended"
+export dev="$arq/dev"
+export res="$arq/resources"
+
+# Home
 export home="$HOME"
+export con="$home/.config"
+export scp="$con/scripts"
 
 # Arquive locations
 export dev="$arq/dev"
@@ -106,11 +122,17 @@ export res="$arq/resources"
 export dat="$res/data/"
 export liv="$res/livros"
 export doc="$res/documentos"
-export img="$res/imagens"
-export wpp="$res/Wallpaper"
-export scr="${home}/screenshots"
-export con="${home}/.config"
-export scp="$con/scripts"
+export media="$res/media"
+
+# Media
+export vid="$media/videos"
+export sfx="$media/sfx"
+export mus="$media/musicas"
+
+# Images
+export img="$media/imagens"
+export scr="$img/screenshots"
+export wpp="$img/wallpaper"
 
 # Environment
 #------------------------------------------------------------
@@ -167,20 +189,24 @@ alias alrc='nvim ~/.config/alacritty/alacritty.yml'
 # Atalhos
 #------------------------------------------------------------
 
-alias pmail="xdg-open https://mail.proton.me/u/0/inbox & disown"
 alias r='ranger' 
-alias e="files"
-alias code="codium ."
-alias docker="podman"
+alias e="dolphin"
 alias nv="nvim"
 
+alias gmail="xdg-open https://mail.google.com/mail/u/0/ & disown"
+alias pmail="xdg-open https://mail.proton.me/u/0/inbox & disown"
 alias lowdl='yt-dlp -S "res:720,fps" '
+alias adlo='yt-dlp -f bestaudio -x --audio-format opus --audio-quality 320k'
 alias adl='yt-dlp -f ba'
+alias strdl='yt-dlp -S "res:720,fps" -i --external-downloader aria2c --download-archive file'
 alias du="du -h -s --apparent-size"
 alias grep='grep -i --colour=auto' # grep colorido e case insensitive
+alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
+
 alias killscr="rm $scr/**" # Delete all screenshots
 
 # Set current dir as a safe.dir
+alias safe="git config --global --add safe.directory $(pwd)"
 alias gsd="git config --global --add safe.directory $(pwd)"
 
 #Util
@@ -188,22 +214,14 @@ alias gc='xprop | grep -i wm_class | cut -d\" -f 4' # Busca a classe de uma jane
 # Busca a classe de uma janela e move para area de transferencia
 alias cgc='xprop | grep -i wm_class | cut -d\" -f 4 | xclip -i -sel clip'
 
-alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
-
 # Scripts
 #------------------------------------------------------------
-
 
 #############################################################
 # Sources                                                   #
 #############################################################
 
 # source "/opt/asdf-vm/bin/asdf.sh"
-
-#############################################################
-# CONSTANTS                                                 #
-#############################################################
-
 
 #############################################################
 # Functions                                                 #
@@ -381,19 +399,6 @@ if [[ -e $(where feh) ]]; then
     alias feh="feh -."
     alias fscr="feh $scr/** -F"
     alias fdlp="feh -. -D 2.6 -z -n $dlp/ "
-fi
-
-#############################################################
-# Oh my zsh activation                                      #
-#############################################################
-
-if [[ -d "$home/.oh-my-zsh" ]]; then
-    alias shrc='nvim ~/.zshrc && omz reload' 
-
-    export ZSH="$home/.oh-my-zsh"
-    ZSH_THEME="philips"
-    plugins=(git tmux urltools spring httpie asdf gitignore)
-    source $ZSH/oh-my-zsh.sh
 fi
 
 #############################################################
