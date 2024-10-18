@@ -45,3 +45,5 @@ inoremap <C-d> <Del>
 
 "New line below
 inoremap <C-n> <Esc>o
+
+set ideajoin
