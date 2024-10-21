@@ -86,8 +86,7 @@ fi
 # Shortcuts
 #----------------------------------------------
 
-bindkey -s '\e[' 'PREV=$(pwd); cd ..; echo $PREV\n'
-bindkey -s '\e^]' 'cd $PREV\n'
+bindkey -s '\e^[' 'PREV=$(pwd); cd ..; echo $PREV\n'
 
 bindkey -s '\el' 'ls\n'
 bindkey -s '\ew' 'pwd\n'
