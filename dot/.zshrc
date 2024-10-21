@@ -38,10 +38,10 @@ zstyle ':vcs_info:git:*' formats '(%b)'
 # Oh my zsh activation                                      #
 #############################################################
 
-if [[ -d "$home/.oh-my-zsh" ]]; then
+if [[ -d "$HOME/.oh-my-zsh" ]]; then
     alias shrc='nvim ~/.zshrc && omz reload' 
 
-    export ZSH="$home/.oh-my-zsh"
+    export ZSH="$HOME/.oh-my-zsh"
     ZSH_THEME="philips"
     plugins=(git tmux urltools spring httpie asdf gitignore)
     source $ZSH/oh-my-zsh.sh
