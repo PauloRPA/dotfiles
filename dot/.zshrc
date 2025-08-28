@@ -20,6 +20,7 @@ parse_git_branch() {
 setopt PROMPT_SUBST
 
 PS1=$'[%B%F{14}%n%f%b: %B%F{blue}%1~%f%b]%B$(parse_git_branch)%F{red}$ %f%b'
+zstyle ':omz:update' mode disabled  # disable automatic updates
 
 ######################################
 #             Completion             #
@@ -86,7 +87,7 @@ fi
 # Shortcuts
 #----------------------------------------------
 
-bindkey -s '\e^[' 'PREV=$(pwd); cd ..; echo $PREV\n'
+bindkey -s '\e^[' 'cd ..'
 
 bindkey -s '\el' 'ls\n'
 bindkey -s '\ew' 'pwd\n'
@@ -111,7 +112,6 @@ export res="$arq/resources"
 # Home
 export home="$HOME"
 export con="$home/.config"
-export scp="$con/scripts"
 
 # Arquive locations
 export dev="$arq/dev"
@@ -142,22 +142,23 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share"
 # Software Paths
 #------------------------------------------------------------
 
-if [[ -e $(where asdf) ]]; then
-    export PATH="$PATH:/opt/asdf-vm/bin" # asdf bin
-    export JAVA_HOME=$(asdf where java)
+# Deprecated ASDF Config
+# if [[ -e $(where asdf) ]]; then
+#     export PATH="$PATH:/opt/asdf-vm/bin" # asdf bin
+#     export JAVA_HOME=$(asdf where java)
+#
+#     if ! [[ -d "$home/.oh-my-zsh" ]]; then
+#         . "$home/.asdf/asdf.sh"
+#         # append completions to fpath
+#         fpath=(${ASDF_DIR}/completions $fpath)
+#         # initialise completions with ZSH's compinit
+#         autoload -Uz compinit && compinit
+#     fi
+# fi
 
-    if ! [[ -d "$home/.oh-my-zsh" ]]; then
-        . "$home/.asdf/asdf.sh"
-        # append completions to fpath
-        fpath=(${ASDF_DIR}/completions $fpath)
-        # initialise completions with ZSH's compinit
-        autoload -Uz compinit && compinit
-    fi
-fi
-
-export PATH="$PATH:$con" # Scripts path
 export PATH="$PATH:$home/.local/bin" # Local bin
-
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+export JAVA_HOME=$(asdf where java)
 
 #############################################################
 # Alias                                                     #
@@ -189,7 +190,6 @@ alias alrc='nvim ~/.config/alacritty/alacritty.yml'
 #------------------------------------------------------------
 
 alias r='ranger' 
-alias e="dolphin"
 alias nv="nvim"
 
 alias gmail="xdg-open https://mail.google.com/mail/u/0/ & disown"
@@ -200,13 +200,12 @@ alias adl='yt-dlp -f ba'
 alias strdl='yt-dlp -S "res:720,fps" -i --external-downloader aria2c --download-archive file'
 alias du="du -h -s --apparent-size"
 alias grep='grep -i --colour=auto' # grep colorido e case insensitive
+
 alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
+alias cc='wl-copy' # envia o standard input para o clipboard
+alias cv='wl-paste' # printa o standard output 
 
 alias killscr="rm $scr/**" # Delete all screenshots
-
-# Set current dir as a safe.dir
-alias safe="git config --global --add safe.directory $(pwd)"
-alias gsd="git config --global --add safe.directory $(pwd)"
 
 #Util
 alias gc='xprop | grep -i wm_class | cut -d\" -f 4' # Busca a classe de uma janela
@@ -225,6 +224,10 @@ alias cgc='xprop | grep -i wm_class | cut -d\" -f 4 | xclip -i -sel clip'
 #############################################################
 # Functions                                                 #
 #############################################################
+
+function f () {
+    copy_current_path_or_file_wayland $@
+}
 
 function fp () {
     copy_current_path_or_file $@
@@ -250,6 +253,11 @@ function kde_restart () {
 	zsh -c 'plasmashell --replace & disown'
 }
 
+# Copy current path or the referenced file path: <file> (wayland)
+function copy_current_path_or_file_wayland (){
+	echo -n "$(pwd)/$1" | wl-copy
+}
+
 # Copy current path or the referenced file path: <file>
 function copy_current_path_or_file (){
 	echo -n "$(pwd)/$1" | xclip -i -sel clip
@@ -264,6 +272,91 @@ function get_maven_java_project_classpath(){
 # Output clipboard content
 function get_clipboard () {
     echo $(xclip -o -sel clip)
+}
+
+# This function Downloads streams from any supported sources
+function dlst () {
+    # $1 = https://www.twitch.tv/gaules 
+    yt-dlp -S "res:720,fps" -i --external-downloader aria2c --download-archive stream "$1"
+}
+
+# This function Downloads songs from any supported sources
+function dlsp () {
+    # $1 playlist = spotify:playlist:4CWuuvLwRQ2CBZlDZaxCzi
+    podman run -it --rm -v .:/data docker.io/freyrcli/freyrjs --no-net-check get "$1"
+}
+
+# This function removes orphan packages from the system
+function remove_orphans () {
+    sudo pacman -Rsu $(pacman -Qdtq)
+}
+
+# This function records the screen
+function record () {
+    ffmpeg -f x11grab -video_size 800x800 -i :0.0+0,0 -codec:v libx264 -pix_fmt yuv420p out.mkv && mpv out.mkv
+}
+
+# This function lists the largest packages on the system
+function largest_packages () {
+     pacman -Qi | gawk '/^Name/ { x = $3 }; /^Installed Size/ { sub(/Installed Size  *:/, ""); print x":" $0 }' | sort -k2,3rn | head -n10 | gawk 'BEGIN { print "\n""These are your 10 largest programs:""\n" }; { print }'
+}
+
+# This function lists the sizes of the packages installed on the system
+function list_packages_size () {
+    pacman -Qi | gawk '/^Name/ { x = $3 }; /^Installed Size/ { sub(/Installed Size  *:/, ""); print x":" $0 }' | sort -k2,3n
+}
+
+# This function runs the MariaDB client
+function podcmd () {
+	echo 'podman run --network host -ti docker.io/library/mariadb:latest mariadb -P 8999 -u prpa -p'
+}
+
+function e(){
+    dolphin $@ > /dev/null 2>&1 & disown 
+}
+
+function togif () {
+    video="$1"
+    fps="fps=10"
+    scale="scale=1280:-1:flags=lanczos"
+
+    if ! [[ -z "$2" ]]; then 
+        fps="fps=$2"
+    fi
+
+    if ! [[ -z "$3" ]]; then 
+        scale="scale=$3:-1:flags=lanczos"
+    fi
+
+    echo "Converting -> $1 to gif at $fps fps and scale $scale."
+
+    ffmpeg -i $video -vf "$fps,$scale,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 "$1.gif"
+}
+
+function togifb () {
+    videos=("${@:3}")
+    fps="fps=10"
+    scale="scale=1280:-1:flags=lanczos"
+
+    echo "============================"
+    echo "Converting -> $videos "
+    echo "============================"
+
+    if ! [[ -z "$1" ]]; then 
+        fps="fps=$1"
+    fi
+
+    if ! [[ -z "$2" ]]; then 
+        scale="scale=$2:-1:flags=lanczos"
+    fi
+
+    for video in $videos
+    do
+        echo "Converting -> $video to gif at $fps fps and scale $scale."
+        ffmpeg -i "$video" -vf "$fps,$scale,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 "${video%.*}.gif"
+        echo "------------------------------------"
+    done
+
 }
 
 # Remove background of an image
@@ -338,31 +431,6 @@ function rm_background () {
 #############################################################
 # AutoStart                                                 #
 #############################################################
-# Automatically initiate ssh-agent and add ID and GitHub keys to it.
-#------------------------------------------------------------
-
-#SSH_ENV="$HOME/.ssh/agent-environment"
-#
-#function start_agent {
-#    echo "Initialising new SSH agent..."
-#    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-#    echo succeeded
-#    chmod 600 "${SSH_ENV}"
-#    . "${SSH_ENV}" > /dev/null
-#    /usr/bin/ssh-add ~/.ssh/* 
-#}
-#
-## Source SSH settings, if applicable
-#
-#if [ -f "${SSH_ENV}" ]; then
-#    . "${SSH_ENV}" > /dev/null
-#    #ps ${SSH_AGENT_PID} doesn't work under cywgin
-#    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-#        start_agent;
-#    }
-#else
-#    start_agent;
-#fi
 
 #############################################################
 # Software dependant config                                 #
