@@ -46,4 +46,7 @@ inoremap <C-d> <Del>
 "New line below
 inoremap <C-n> <Esc>o
 
+"Clear the search
+nnoremap <Space>0 /\|\|\-\-\-\|\|<CR>
+
 set ideajoin
