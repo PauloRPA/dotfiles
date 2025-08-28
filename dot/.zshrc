@@ -87,7 +87,7 @@ fi
 # Shortcuts
 #----------------------------------------------
 
-bindkey -s '\e^[' 'cd ..'
+bindkey -s '\e^[' 'cd ..\n'
 
 bindkey -s '\el' 'ls\n'
 bindkey -s '\ew' 'pwd\n'
