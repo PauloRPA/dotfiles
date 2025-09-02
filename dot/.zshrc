@@ -105,7 +105,7 @@ bindkey -s '\en' 'nvim\n'
 #------------------------------------------------------------
 
 # Archive root
-export arq="/mnt/extended"
+export arq="/mnt/extended/rt"
 export dev="$arq/dev"
 export res="$arq/resources"
 
