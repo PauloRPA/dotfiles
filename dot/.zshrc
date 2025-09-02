@@ -185,6 +185,7 @@ alias shrc='nvim ~/.zshrc && source ~/.zshrc'
 alias nvrc='nvim ~/.config/nvim/init.lua' 
 alias porc='nvim ~/.config/polybar/config' 
 alias alrc='nvim ~/.config/alacritty/alacritty.yml' 
+alias ec='env | grep -i "$(cv)"'
 
 # Atalhos
 #------------------------------------------------------------
