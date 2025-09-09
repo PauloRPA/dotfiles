@@ -205,6 +205,7 @@ alias grep='grep -i --colour=auto' # grep colorido e case insensitive
 alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
 alias cc='wl-copy' # envia o standard input para o clipboard
 alias cv='wl-paste' # printa o standard output 
+alias i='idea . &>/dev/null & disown' # printa o standard output 
 
 alias killscr="rm $scr/**" # Delete all screenshots
 
