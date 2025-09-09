@@ -3,6 +3,7 @@ set scrolloff=6
 set hlsearch
 set ignorecase
 set smartcase
+set visualbell
 
 "Pane op "Select * pane
 nnoremap <C-l> <C-w>l
