@@ -138,6 +138,7 @@ export wpp="$img/wallpaper"
 
 export EDITOR=nvim
 export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share"
+export COLORTERM=truecolor
 
 # Software Paths
 #------------------------------------------------------------
@@ -316,6 +317,15 @@ function podcmd () {
 function e(){
     dolphin $@ > /dev/null 2>&1 & disown 
 }
+
+function mh () {
+    if [[ -z "$1" ]]; then
+        echo Nenhum goal especificado
+        return
+    fi
+    mvn "$1":help -Ddetail=true 2>/dev/null | grep -vE '\[' | grep -vE '^Downloa.*' | grep -vE '^Progress' |  bat -l mvn
+}
+
 
 function togif () {
     video="$1"

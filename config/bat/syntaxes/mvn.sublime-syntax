@@ -1,0 +1,33 @@
+%YAML 1.2
+---
+name: mvn-help
+file_extensions: [mvn]
+scope: source.c
+
+contexts:
+  main:
+    - match: '\bThis plugin has (\d*) goals\b'
+      scope: keyword.control.c
+      captures:
+        1: entity.name.function.c++
+    - match: '(^\w*):([\w-]*$)'
+      captures:
+        1: keyword.control.c
+        2: meta.preprocessor.c++
+    - match: '\bAvailable parameters:'
+      scope: keyword.control.c
+    - match: '^\s\s\s\s\w*($| \(Default:(.*)\))'
+      scope: entity.name.function.c++
+      captures:
+        1: meta.preprocessor.c++
+        2: string.quoted.double.c
+    - match: '\bUser property: (.*)'
+      scope: entity.name.type
+      captures:
+        1: string.quoted.double.c
+    - match: '\bRequired: (.*)'
+      scope: entity.name.type
+      captures:
+        1: string.quoted.double.c
+    - match: '\bSee also:'
+      scope: string.quoted.double.c
