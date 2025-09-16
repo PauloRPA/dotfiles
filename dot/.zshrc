@@ -112,6 +112,7 @@ export res="$arq/resources"
 # Home
 export home="$HOME"
 export con="$home/.config"
+export sources="$con/sources"
 
 # Arquive locations
 export dev="$arq/dev"
@@ -221,6 +222,11 @@ alias cgc='xprop | grep -i wm_class | cut -d\" -f 4 | xclip -i -sel clip'
 #############################################################
 # Sources                                                   #
 #############################################################
+
+for file in "$(ls $sources)"
+do
+    . $sources/$file
+done
 
 # source "/opt/asdf-vm/bin/asdf.sh"
 
