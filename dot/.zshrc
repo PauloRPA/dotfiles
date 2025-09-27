@@ -91,6 +91,7 @@ bindkey -s '\e^[' 'cd ..\n'
 
 bindkey -s '\el' 'ls\n'
 bindkey -s '\ew' 'pwd\n'
+bindkey -s '\ek' '^ahelp ^e\n'
 
 bindkey -s '\eo' 'git log --oneline\n'
 bindkey -s '\es' 'git status\n'
@@ -183,7 +184,7 @@ alias d="cd ${home}/Desktop"
 #------------------------------------------------------------
 
 alias 3r='nvim ~/.config/i3/config' 
-alias shrc='nvim ~/.zshrc && source ~/.zshrc' 
+alias shrc='nvim ~/.zshrc && . ~/.zshrc' 
 alias nvrc='nvim ~/.config/nvim/init.lua' 
 alias porc='nvim ~/.config/polybar/config' 
 alias alrc='nvim ~/.config/alacritty/alacritty.yml' 
@@ -276,6 +277,17 @@ function copy_current_path_or_file (){
 function get_maven_java_project_classpath(){
     mvnRAWBuildClasspath=$(mvn dependency:build-classpath)
     mvnBuildClasspath="$(echo $mvnRAWBuildClasspath | grep -vE "\[INFO\]|\[ERROR\]")"
+}
+
+function help () {
+    if [[ -z "$@" ]]; then
+        return
+    fi
+    if ! [[ -z "$(where bat)" ]]; then
+        "$@" --help | bat -l help
+        return
+    fi
+    $@ --help | less
 }
 
 # Output clipboard content
@@ -472,6 +484,11 @@ if [[ -e $(where exa) ]]; then
     alias tree='exa --tree ' # atalho mostra uma tree
     alias ltree='exa --tree --level=2' # atalho exa -la
     alias long='exa --tree --long --level=2' # atalho exa -la
+fi
+
+if [[ -e "$(where batman)" ]]; then
+    # Bat-extras dependent
+    alias man='batman'
 fi
 
 if [[ -e $(where bat) ]]; then
