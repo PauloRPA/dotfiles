@@ -1,5 +1,6 @@
-filename=pkglistbackup.txt
-touch /etc/pacman.d/hooks/backup_installed_packages.hook
+filename=syspkgs.txt
+mkdir -p '/etc/pacman.d/hooks'
+touch '/etc/pacman.d/hooks/backup_installed_packages.hook'
 cat > /etc/pacman.d/hooks/backup_installed_packages.hook << EOF
 [Trigger]
 Operation = Install
