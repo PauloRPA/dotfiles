@@ -33,6 +33,10 @@ nnoremap <S-Tab> :bp<CR>
 "Delete word after
 inoremap <A-d> <C-o>cw
 
+"Move a word *
+inoremap <A-b> <C-Left>
+inoremap <A-f> <C-Right>
+
 "Move a char *
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
@@ -50,4 +54,12 @@ inoremap <C-n> <Esc>o
 "Clear the search
 nnoremap <Space>0 /\|\|\-\-\-\|\|<CR>
 
+"Visual ident
+xnoremap < <gv
+xnoremap > >gv
+
 set ideajoin
+
+nmap <A-s> <Action>(flash.search)
+xmap <A-s> <Action>(flash.search)
+
