@@ -91,7 +91,7 @@ bindkey -s '\e^[' 'cd ..\n'
 
 bindkey -s '\el' 'ls\n'
 bindkey -s '\ew' 'pwd\n'
-bindkey -s '\ek' '^ahelp ^e\n'
+bindkey -s '\ek' '^ahelp ^e\n\ep^a\ed^d^e'
 
 bindkey -s '\eo' 'git log --oneline\n'
 bindkey -s '\es' 'git status\n'
@@ -208,6 +208,8 @@ alias grep='grep -i --colour=auto' # grep colorido e case insensitive
 alias clip='xclip -i -sel clip' # envia o standard input para o clipboard
 alias cc='wl-copy' # envia o standard input para o clipboard
 alias cv='wl-paste' # printa o standard output 
+alias lg='lazygit' # printa o standard output 
+alias lz='lazygit' # printa o standard output 
 alias i='idea . &>/dev/null & disown' # printa o standard output 
 
 alias killscr="rm $scr/**" # Delete all screenshots
@@ -253,6 +255,10 @@ function install_asdf () {
     git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
 }
 
+function serve () {
+    python -m http.server
+}
+
 # Find mime type of a file: <file> 
 function get_file_mime_type () {
     file -i "$1" | cut -d ':' -f 2 | tr -d ';' | cut -d ' ' -f 2
@@ -270,7 +276,7 @@ function copy_current_path_or_file_wayland (){
 
 # Copy current path or the referenced file path: <file>
 function copy_current_path_or_file (){
-	echo -n "$(pwd)/$1" | xclip -i -sel clip
+	echo -n "$(pwd)/$1" | wl-copy
 }
 
 # Outputs the classpath of a java project managed by maven 
@@ -305,6 +311,10 @@ function dlst () {
 function dlsp () {
     # $1 playlist = spotify:playlist:4CWuuvLwRQ2CBZlDZaxCzi
     podman run -it --rm -v .:/data docker.io/freyrcli/freyrjs --no-net-check get "$1"
+}
+
+function sync_mirrors () {
+    sudo reflector --latest 20 --sort rate --save /etc/pacman.d/mirrorlist
 }
 
 # This function removes orphan packages from the system
